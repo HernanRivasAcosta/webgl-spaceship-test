@@ -1,0 +1,1 @@
+docker run -d --rm --name webgl-demo -p80:80 $DOCKER_USER_ID/webgl-demo 
