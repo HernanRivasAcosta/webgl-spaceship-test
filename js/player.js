@@ -1,5 +1,15 @@
 class Player
 {
+
+  get x() { return this._camera.x; };
+  set x(v) { this._camera.x = v; };
+
+  get y() { return this._camera.y; };
+  set y(v) { this._camera.y = v; };
+
+  get z() { return this._camera.z; };
+  set z(v) { this._camera.z = v; };
+
   //============================================================================
   // Constructor
   //============================================================================

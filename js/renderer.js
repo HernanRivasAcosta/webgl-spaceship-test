@@ -13,8 +13,10 @@ class Renderer
   //============================================================================
   // Constructor
   //============================================================================
-  constructor(win, doc)
+  constructor(win, doc, drawDistance)
   {
+    this._drawDistance = drawDistance;
+
     // Get the main properties
     this._w = win.innerWidth;
     this._h = win.innerHeight;
@@ -52,7 +54,7 @@ class Renderer
   _createMainProgram(gl)
   {
     // Load the shaders
-    let vsSource = mainVertexShaderSource();
+    let vsSource = mainVertexShaderSource(this._drawDistance);
     let vs = loadShader(gl, gl.VERTEX_SHADER, vsSource);
     let fsSource = mainFragmentShaderSource();
     let fs = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);

@@ -36,7 +36,7 @@ function enclosingPowerOf2(n)
 {
   let a = 1;
   while (n > a)
-    a *= 2;
+    a <<= 1;
   return a;
 }
 

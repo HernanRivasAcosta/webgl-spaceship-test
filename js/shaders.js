@@ -1,7 +1,7 @@
 //==============================================================================
 // Shaders
 //==============================================================================
-function mainVertexShaderSource()
+function mainVertexShaderSource(drawDistance)
 {
   return `precision mediump float;
 
@@ -22,11 +22,11 @@ function mainVertexShaderSource()
 
             gl_Position = projectionMatrix * cs_position;
 
-            vdistToCamera = 1.0 - gl_Position.z / 2500.0;
+            vdistToCamera = 1.0 - gl_Position.z / DRAW_DISTANCE.0;
             //vdistToCamera *= vdistToCamera;
             vCenter = vertexCenter;
             vColor = vertexColor;
-          }`;
+          }`.replace('DRAW_DISTANCE', drawDistance);
 }
 
 function mainFragmentShaderSource()
@@ -61,6 +61,24 @@ function glowVertexShaderSource()
             gl_Position = vec4(vertexPosition, 1.0, 1.0);
           }`;
 }
+
+// Use this frag shader instead to quickly remove the glow
+//function glowFragmentShaderSource(w, w2, h, h2)
+//{
+//  console.trace(w, w2);
+//  return `#extension GL_OES_standard_derivatives : enable
+//          precision mediump float;
+//          uniform sampler2D uSampler;
+//          varying vec2 vTexcoord;
+
+//          void main(void)
+//          {
+//            vec2 uv = vTexcoord * vec2(RATIO_X, RATIO_Y);
+//            vec3 color = vec3(0,0,0);
+//            color.rgb = texture2D(uSampler, uv).rgb;
+//            gl_FragColor = vec4(color.rgb, 1.0);
+//          }`.replace('RATIO_X', w / w2).replace('RATIO_Y', h / h2).replace('WIDTH', w2);
+//}
 
 function glowFragmentShaderSource(w, w2, h, h2)
 {

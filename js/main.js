@@ -1,14 +1,16 @@
 //==============================================================================
 // Setup
 //==============================================================================
-let _camera = new Camera();
-let _renderer = new Renderer(window, document);
+let drawDistance = 4000;
+let _camera = new Camera(drawDistance);
+let _renderer = new Renderer(window, document, drawDistance);
 _renderer.camera = _camera;
 
 //==============================================================================
 // Objects
 //==============================================================================
-let worldSize = 8000;
+let worldSize = 10000;
+let maxHeight = 1000;
 
 let objects = [];
 
@@ -20,13 +22,17 @@ for (let i = 1; i <= 100; i++)
   let enemy = new Enemy(worldSize);
   enemy.setPosition((Math.random() - 0.5) * worldSize,
                     (Math.random() - 0.5) * worldSize,
-                    Math.random() * 250 + 50);
+                    maxHeight * (0.4 + Math.random() * 0.4));
   objects[i] = enemy;
   _renderer.addObject(enemy);
 }
 
-let _terrain = new Drawable(new TerrainModel(worldSize, worldSize, 99));
-_renderer.addObject(_terrain);
+let _terrain = new TerrainModel(worldSize, maxHeight, 128, 3473)
+let _ground = new Drawable(_terrain);
+_renderer.addObject(_ground);
+
+
+_player.z = maxHeight;
 
 //==============================================================================
 // Update
