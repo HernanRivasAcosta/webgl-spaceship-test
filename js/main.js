@@ -9,7 +9,7 @@ _renderer.camera = _camera;
 //==============================================================================
 // Objects
 //==============================================================================
-let worldSize = 10000;
+let tileSize = 100;
 let maxHeight = 1000;
 
 let objects = [];
@@ -17,6 +17,11 @@ let objects = [];
 let _player = new Player(_camera);
 objects[0] = _player;
 
+let _terrain = new TerrainModel(tileSize, maxHeight, 128, 3473)
+let _ground = new Drawable(_terrain);
+_renderer.addObject(_ground);
+
+let worldSize = _terrain.getSize();
 for (let i = 1; i <= 100; i++)
 {
   let enemy = new Enemy(worldSize);
@@ -26,10 +31,6 @@ for (let i = 1; i <= 100; i++)
   objects[i] = enemy;
   _renderer.addObject(enemy);
 }
-
-let _terrain = new TerrainModel(worldSize, maxHeight, 128, 3473)
-let _ground = new Drawable(_terrain);
-_renderer.addObject(_ground);
 
 
 _player.z = maxHeight;

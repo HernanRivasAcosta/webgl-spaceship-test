@@ -1,6 +1,11 @@
 class TerrainModel extends Model
 {
 
+  getSize()
+  {
+    return this._w;
+  }
+
   getHeight(x, y)
   {
     // TODO: This function doesn't work because the 4 points of the quad are not
@@ -14,9 +19,9 @@ class TerrainModel extends Model
   {
     super('terrain');
 
-    this._w = w;
     this._h = h;
     this._s = enclosingPowerOf2(s);
+    this._w = w * this._s;
     this._heightMap = null;
     this._seed = seed;
     this._generate();
@@ -97,6 +102,9 @@ class TerrainModel extends Model
   _getHeight(i, j)
   {
     let h = this._heightMap.getHeight(i, j);
+    if (h < 0.2)
+      h = 0;
+    else h -= 0.2;
     return h * this._h;
   }
 }
