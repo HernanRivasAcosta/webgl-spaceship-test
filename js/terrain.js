@@ -28,6 +28,14 @@ class TerrainModel extends Model
 
     this._initVertices(2 * 4 * this._s * this._s);
 
+    let bCoordinates = [1.0, 0.0, 0.0,
+                        1.0, 1.0, 0.0,
+                        0.0, 0.0, 1.0,
+                        1.0, 0.0, 0.0,
+                        0.0, 1.0, 1.0,
+                        0.0, 0.0, 1.0];
+    bCoordinates = bCoordinates.concat(bCoordinates, bCoordinates);
+
     let n;
     let l = this._s;
     for (let i = 0; i < l; i++)
@@ -51,24 +59,7 @@ class TerrainModel extends Model
                            n + 15);
 
         // Barycentric data
-        this._bCoordinates.set([1.0, 0.0, 0.0,
-                                1.0, 1.0, 1.0,
-                                0.0, 0.0, 1.0,
-                                1.0, 0.0, 0.0,
-                                1.0, 1.0, 1.0,
-                                0.0, 0.0, 1.0,
-                                1.0, 0.0, 0.0,
-                                1.0, 1.0, 1.0,
-                                0.0, 0.0, 1.0,
-                                1.0, 0.0, 0.0,
-                                1.0, 1.0, 1.0,
-                                0.0, 0.0, 1.0,
-                                1.0, 0.0, 0.0,
-                                1.0, 1.0, 1.0,
-                                0.0, 0.0, 1.0,
-                                1.0, 0.0, 0.0,
-                                1.0, 1.0, 1.0,
-                                0.0, 0.0, 1.0], n);
+        this._bCoordinates.set(bCoordinates, n);
 
         // Colour data
         let r = 0.8;

@@ -22,11 +22,14 @@ function mainVertexShaderSource(drawDistance)
 
             gl_Position = projectionMatrix * cs_position;
 
-            vdistToCamera = 1.0 - gl_Position.z / DRAW_DISTANCE.0;
-            //vdistToCamera *= vdistToCamera;
+            vdistToCamera = 1.0 - gl_Position.z / DRAW_DISTANCE;
+            if (vdistToCamera > 0.5)
+              vdistToCamera = 1.0;
+            else
+              vdistToCamera = vdistToCamera / 0.5;
             vCenter = vertexCenter;
             vColor = vertexColor;
-          }`.replace('DRAW_DISTANCE', drawDistance);
+          }`.replace('DRAW_DISTANCE', drawDistance + '.0');
 }
 
 function mainFragmentShaderSource()
@@ -40,7 +43,7 @@ function mainFragmentShaderSource()
 
           void main(void)
           {
-            if(vCenter.x <= 0.03 || vCenter.y <= 0.03 || vCenter.z <= 0.03)
+            if(vCenter.x <= 0.02 || vCenter.y <= 0.02 || vCenter.z <= 0.02)
               gl_FragColor.rgb = vColor * vec3(vdistToCamera);
             else
               gl_FragColor.rgb = vec3(0.0);
