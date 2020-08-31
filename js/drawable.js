@@ -22,6 +22,11 @@ class Drawable extends WorldObject
     this._model.bindBuffers(gl);
   }
 
+  unbindBuffers(gl)
+  {
+    this._model.unbindBuffers(gl);
+  }
+
   getMatrix(renderer)
   {
     let mat = mat4.create();

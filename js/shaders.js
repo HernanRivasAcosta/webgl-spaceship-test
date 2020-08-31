@@ -73,7 +73,7 @@ function glowVertexShaderSource()
 //          precision mediump float;
 //          uniform sampler2D uSampler;
 //          varying vec2 vTexcoord;
-
+//
 //          void main(void)
 //          {
 //            vec2 uv = vTexcoord * vec2(RATIO_X, RATIO_Y);

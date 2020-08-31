@@ -10,6 +10,13 @@ class Player
   get z() { return this._camera.z; };
   set z(v) { this._camera.z = v; };
 
+  getPosition()
+  {
+    return '(' + this._camera.x.toFixed(1) + ', ' +
+                 this._camera.y.toFixed(1) + ', ' +
+                 this._camera.z.toFixed(1) + ')';
+  }
+
   //============================================================================
   // Constructor
   //============================================================================
@@ -17,6 +24,7 @@ class Player
   {
     this._camera = camera;
     this._camera._z = 150;
+    this._camera._rz = 2*Math.PI;
 
     // Speed
     this._sx = 0.0;

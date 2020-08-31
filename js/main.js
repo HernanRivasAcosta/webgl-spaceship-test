@@ -1,39 +1,42 @@
 //==============================================================================
 // Setup
 //==============================================================================
-let drawDistance = 4000;
-let _camera = new Camera(drawDistance);
-let _renderer = new Renderer(window, document, drawDistance);
+let _drawDistance = 4000;
+let _camera = new Camera(_drawDistance);
+let _renderer = new Renderer(window, document, _drawDistance);
 _renderer.camera = _camera;
+
+// Debug UI
+let position = document.getElementById('positionField');
+let chunk = document.getElementById('chunkField');
 
 //==============================================================================
 // Objects
 //==============================================================================
-let tileSize = 100;
-let maxHeight = 1000;
+let TILE_SIZE = 150;
+let MAX_HEIGHT = 1500;
 
 let objects = [];
 
 let _player = new Player(_camera);
 objects[0] = _player;
 
-let _terrain = new TerrainModel(tileSize, maxHeight, 128, 3473)
-let _ground = new Drawable(_terrain);
-_renderer.addObject(_ground);
+let _terrain = new TerrainModel(TILE_SIZE, MAX_HEIGHT, 30, 999, _player, _renderer);
+objects[1] = _terrain;
 
-let worldSize = _terrain.getSize();
-for (let i = 1; i <= 100; i++)
-{
-  let enemy = new Enemy(worldSize);
-  enemy.setPosition((Math.random() - 0.5) * worldSize,
-                    (Math.random() - 0.5) * worldSize,
-                    maxHeight * (0.4 + Math.random() * 0.4));
-  objects[i] = enemy;
-  _renderer.addObject(enemy);
-}
+//let worldSize = _terrain.chunkSize;
+//for (let i = 0; i <= 200; i++)
+//{
+//  let enemy = new Enemy(worldSize);
+//  enemy.setPosition((Math.random() - 0.5) * worldSize,
+//                    (Math.random() - 0.5) * worldSize,
+//                    MAX_HEIGHT * (0.4 + Math.random() * 0.4));
+//  objects[2 + i] = enemy;
+//  _renderer.addObject(enemy);
+//}
 
 
-_player.z = maxHeight;
+_player.z = MAX_HEIGHT;
 
 //==============================================================================
 // Update
@@ -56,5 +59,8 @@ function render(now)
 
   _renderer.update(delta);
   requestAnimationFrame(render);
+
+  position.innerHTML = 'position: ' + _player.getPosition();
+  chunk.innerHTML = 'chunk: ' + _terrain.getCurrentChunk();
 }
 requestAnimationFrame(render);

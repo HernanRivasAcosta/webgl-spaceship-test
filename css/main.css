@@ -4,6 +4,17 @@
   padding:0;
 }
 
+#console
+{
+  position: absolute;
+  font-size: 15px;
+  font-family: monospace;
+  color: white;
+  z-index: 1;
+  min-width: 250px;
+  background: #44444480;
+}
+
 html, body
 {
   width:100%;
@@ -13,4 +24,6 @@ html, body
 canvas
 {
   display:block;
+  position: absolute;
+  z-index: 0;
 }

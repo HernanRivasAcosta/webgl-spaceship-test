@@ -305,4 +305,27 @@ class Renderer
       model.clean();
     }
   }
+
+  removeObject(drawable)
+  {
+    let l = this._objects.length;
+    for (let i = 0; i < l; i++)
+    {
+      // Find the object to remove
+      if (this._objects[i] == drawable)
+      {
+        // We found the object, the length of the array goes down by one
+        l--;
+        // Remove the last element of the list
+        let temp = this._objects.pop();
+        // And put it in the place of the removed object (unless the last object
+        // in the list is the one we were trying to remove)
+        if (temp != drawable)
+          this._objects[i] = temp;
+        // Unbind the buffers
+        drawable.unbindBuffers(this._gl);
+        return;
+      }
+    }
+  }
 }
