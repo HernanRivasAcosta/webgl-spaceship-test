@@ -119,7 +119,9 @@ class Chunk extends Model
     // We already have the maximum height the world should reach, we multiply it
     // by the inverse of the maximum height from our noise function to make sure
     // we don't go over
-    this._mh = mh * 1 / maxHeight;
+    this._hmm = 1/maxHeight;
+
+    this._mh = mh;// * 1 / maxHeight;
 
     this._generate();
   }
@@ -205,6 +207,14 @@ class Chunk extends Model
       let [level, multiplier] = this._noiseLevels[i];
       h += (noise.simplex2(x * level, y * level) + 1) * 0.5 * multiplier;
     }
+
+    h = h *this._hmm;
+    let cutoff = 0.5;
+    if (h < cutoff)
+      h = noise.simplex2(x, y) * 0.01;
+    else
+      h = (h - cutoff) * 1 / (1 - cutoff);
+
     return h * this._mh;
   }
 }

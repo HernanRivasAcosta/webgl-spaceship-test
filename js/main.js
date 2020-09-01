@@ -1,7 +1,7 @@
 //==============================================================================
 // Setup
 //==============================================================================
-let _drawDistance = 4000;
+let _drawDistance = 8000;
 let _camera = new Camera(_drawDistance);
 let _renderer = new Renderer(window, document, _drawDistance);
 _renderer.camera = _camera;
@@ -21,7 +21,7 @@ let objects = [];
 let _player = new Player(_camera);
 objects[0] = _player;
 
-let _terrain = new TerrainModel(TILE_SIZE, MAX_HEIGHT, 30, 999, _player, _renderer);
+let _terrain = new TerrainModel(TILE_SIZE, MAX_HEIGHT, 60, 999, _player, _renderer);
 objects[1] = _terrain;
 
 //let worldSize = _terrain.chunkSize;
@@ -34,7 +34,6 @@ objects[1] = _terrain;
 //  objects[2 + i] = enemy;
 //  _renderer.addObject(enemy);
 //}
-
 
 _player.z = MAX_HEIGHT;
 
