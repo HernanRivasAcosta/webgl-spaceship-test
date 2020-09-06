@@ -99,7 +99,7 @@ class Chunk extends Model
 
   constructor(cx, cy, w, mh, s)
   {
-    super('chunk' + cx + '-' + cy);
+    super('chunk(' + cx + ',' + cy + ')');
 
     this._cx = cx;
     this._cy = cy;
@@ -119,16 +119,19 @@ class Chunk extends Model
     // We already have the maximum height the world should reach, we multiply it
     // by the inverse of the maximum height from our noise function to make sure
     // we don't go over
-    this._hmm = 1/maxHeight;
+    this._hmm = 1 / maxHeight;
 
-    this._mh = mh;// * 1 / maxHeight;
+    this._mh = mh;
 
     this._generate();
   }
 
   _generate()
   {
-    this._initVertices(2 * 4 * this._s * this._s, true);
+    // The total amount of vertices is given by the 2 tris per quad times by the
+    // 3 vertices per tri times the number of quads (the square of the quads per
+    // side)
+    this._initVertices(2 * 3 * this._s * this._s, [0.8, 0.9, 1.0]);
 
     let n;
     let s = this._s;
@@ -138,33 +141,18 @@ class Chunk extends Model
       {
         // Vertex data
         n = 6 * 3 * (x * s + y);
-        this._vertices.set(this._getVertextCoordinates(x, y),
-                           n);
-        this._vertices.set(this._getVertextCoordinates(x + 1, y),
-                           n + 3);
-        this._vertices.set(this._getVertextCoordinates(x, y + 1),
-                           n + 6);
 
-        this._vertices.set(this._getVertextCoordinates(x, y + 1),
-                           n + 9);
-        this._vertices.set(this._getVertextCoordinates(x + 1, y),
-                           n + 12);
-        this._vertices.set(this._getVertextCoordinates(x + 1, y + 1),
-                           n + 15);
-
-        // Barycentric data
-        //this._bCoordinates.set(bCoordinates, n);
-
-        // Colour data
-        let r = 0.8;
-        let g = 0.9;
-        let b = 1.0;
-        this._colours.set(duplicate([r, g, b], 3 * 6), n);
+        this._vertices.set([this._getCoordinates(x, y),
+                            this._getCoordinates(x + 1, y),
+                            this._getCoordinates(x, y + 1),
+                            this._getCoordinates(x, y + 1),
+                            this._getCoordinates(x + 1, y),
+                            this._getCoordinates(x + 1, y + 1)].flat(), n);
       }
     }
   }
 
-  _getVertextCoordinates(x, y)
+  _getCoordinates(x, y)
   {
     x += this._cx * this._s;
     y += this._cy * this._s;
@@ -183,7 +171,7 @@ class Chunk extends Model
       h += (noise.simplex2(x * level, y * level) + 1) * 0.5 * multiplier;
     }
 
-    h = h *this._hmm;
+    h = h * this._hmm;
     let cutoff = 0.5;
     if (h < cutoff)
       h = noise.simplex2(x, y) * 0.01;

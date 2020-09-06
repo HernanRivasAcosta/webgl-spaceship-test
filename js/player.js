@@ -12,8 +12,8 @@ class Player
 
   getPosition()
   {
-    return '(' + this._camera.x.toFixed(1) + ', ' +
-                 this._camera.y.toFixed(1) + ', ' +
+    return '(' + (-this._camera.x).toFixed(1) + ', ' +
+                 (-this._camera.y).toFixed(1) + ', ' +
                  this._camera.z.toFixed(1) + ')';
   }
 
@@ -24,7 +24,7 @@ class Player
   {
     this._camera = camera;
     this._camera._z = 150;
-    this._camera._rz = 2*Math.PI;
+    this._camera._rz = Math.PI;
 
     // Speed
     this._sx = 0.0;
@@ -60,7 +60,7 @@ class Player
 
     // Acceleration
     let a = boosting ? this._a * 3.0 : this._a;
-    let ms = boosting ? this._ms * 3.0 : this._ms;
+    let ms = boosting ? this._ms * 8.0 : this._ms;
 
     if (throttling || boosting)
     {

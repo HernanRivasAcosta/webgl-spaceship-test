@@ -10,7 +10,17 @@ class AssetManager
   {
     this._assets = {};
 
+    console.time('loaded all assets in');
     this._loadAssets(assetList, callback);
+  }
+
+  // For testing only
+  loadAsset(name)
+  {
+    let path = this._getPath(name);
+    console.log('loading', path);
+    fetch(path).then(response => response.text()).
+                then(data => {this._onAssetLoaded(name, data)});
   }
 
   //============================================================================
@@ -29,6 +39,7 @@ class AssetManager
     }
     else
     {
+      console.timeEnd('loaded all assets in');
       callback(this);
     }
   }
@@ -47,7 +58,6 @@ class AssetManager
 
   _onAssetLoaded(name, data)
   {
-    console.log('success');
     this._assets[name] = data;
   }
 }

@@ -71,13 +71,9 @@ class Renderer
     this._objects[this._objects.length] = drawable;
 
     let model = drawable.model;
-    if (!this._models[drawable.model])
+    if (!this._models[drawable.model.name])
     {
       this._models[drawable.model.name] = model.bindBuffers(this._gl);
-    }
-    else
-    {
-      model.clean();
     }
   }
 
@@ -98,6 +94,8 @@ class Renderer
         if (temp != drawable)
           this._objects[i] = temp;
         // Unbind the buffers
+        // TODO: Only unbind if there are no other objects reusing the model
+        delete this._models[drawable.model.name];
         drawable.unbindBuffers(this._gl);
         return;
       }

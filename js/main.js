@@ -62,3 +62,20 @@ const assets = new AssetManager(['prop_column.obj',
                                  'main.frag',
                                  'post_process.vert',
                                  'post_process.frag'], setup);
+
+
+
+
+//==============================================================================
+// Debug only
+//==============================================================================
+function createObject(assetName, x = 5000, y = 0, z = 0)
+{
+  let m = Model.fromObj(assetName, assets.getAssetByName(assetName));
+  let d = new Drawable(m);
+  d.x = x;
+  d.y = y;
+  d.z = z;
+  _renderer.addObject(d);
+  return d;
+}
