@@ -68,3 +68,11 @@ function getSpeed(currentSpeed, acceleration, deceleration, maxSpeed, input, del
   }
   return 0.0;
 }
+
+function duplicate(a, times)
+{
+  let r = [];
+  while(times--)
+    r = r.concat(a);
+  return r;
+}

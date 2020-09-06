@@ -10,6 +10,8 @@ class Renderer
   get camera() { return this._camera; }
   set camera(camera) { this._camera = camera; }
 
+  get drawDistance() { return this._drawDistance; }
+
   //============================================================================
   // Constructor
   //============================================================================

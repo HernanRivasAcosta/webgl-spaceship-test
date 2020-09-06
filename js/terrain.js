@@ -6,9 +6,7 @@ class TerrainModel
 
   getCurrentChunk()
   {
-    let c = this.chunkSize;
-    return '(' + Math.floor(this._player.x / c) + ', ' +
-                 Math.floor(this._player.y / c) + ')';
+    return '(' + this._px + ', ' + this._py + ')';
   }
 
   // Tile width, max height, chunk size, the player object and the renderer
@@ -17,6 +15,7 @@ class TerrainModel
     this._w = w;
     this._mh = mh;
     this._s = s;
+    this._chunkSize = this._w * this._s;
     this._seed = seed;
     noise.seed(seed);
     this._player = player;
@@ -31,13 +30,15 @@ class TerrainModel
 
   update(delta)
   {
-    // Ensure all the required chunks exist
-    let c = this.chunkSize;
-    let cx = Math.floor(this._player.x / c);
-    let cy = Math.floor(this._player.y / c);
+    // The chunk under the player
+    let cx = Math.floor(this._player.x / this.chunkSize);
+    let cy = Math.floor(this._player.y / this.chunkSize);
 
-    this._createChunksAround(cx, cy);
-    this._clearOldChunks(cx, cy);
+    // Get the radius of chunks we need to write
+    let r = Math.ceil(this._renderer.drawDistance / this._chunkSize);
+
+    this._createChunksAround(cx, cy, r);
+    this._clearOldChunks(cx, cy, r);
     this._px = cx;
     this._py = cy;
   }
@@ -45,10 +46,10 @@ class TerrainModel
   //============================================================================
   // Internal functions
   //============================================================================
-  _createChunksAround(cx, cy)
+  _createChunksAround(cx, cy, r)
   {
-    for (let dx = -1; dx <= 1; dx++)
-      for (let dy = -1; dy <= 1; dy++)
+    for (let dx = -r; dx <= r; dx++)
+      for (let dy = -r; dy <= r; dy++)
         this._createChunk(cx + dx, cy + dy);
   }
 
@@ -65,18 +66,16 @@ class TerrainModel
     this._chunks[[cx, cy]] = chunk;
   }
 
-  _clearOldChunks(cx, cy)
+  _clearOldChunks(cx, cy, r)
   {
-    for (let dx = -1; dx <= 1; dx++)
-      for (let dy = -1; dy <= 1; dy++)
+    for (let dx = -r; dx <= r; dx++)
+      for (let dy = -r; dy <= r; dy++)
       {
         // Get the position of all the previous chunks
         let x = this._px + dx;
         let y = this._py + dy;
-        // If the distance to the current position is larger than one, then this
-        // chunk existed on the previous position and not in the current one, so
-        // we can just delete it
-        if (Math.abs(x - cx) > 1 || Math.abs(y - cy) > 1)
+        // Remove all chunks farther away than r
+        if (Math.abs(x - cx) > r || Math.abs(y - cy) > r)
           this._deleteChunk(x, y);
       }
   }
@@ -130,13 +129,12 @@ class Chunk extends Model
   {
     this._initVertices(2 * 4 * this._s * this._s);
 
-    let bCoordinates = [1.0, 0.0, 0.0,
-                        1.0, 1.0, 0.0,
-                        0.0, 0.0, 1.0,
-                        1.0, 0.0, 0.0,
-                        0.0, 1.0, 1.0,
-                        0.0, 0.0, 1.0];
-    bCoordinates = bCoordinates.concat(bCoordinates, bCoordinates);
+    let bCoordinates = duplicate([1.0, 0.0, 0.0,
+                                  1.0, 1.0, 0.0,
+                                  0.0, 0.0, 1.0,
+                                  1.0, 0.0, 0.0,
+                                  0.0, 1.0, 1.0,
+                                  0.0, 0.0, 1.0], 3);
 
     let n;
     let s = this._s;
@@ -167,24 +165,7 @@ class Chunk extends Model
         let r = 0.8;
         let g = 0.9;
         let b = 1.0;
-        this._colours.set([r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b,
-                           r, g, b], n);
+        this._colours.set(duplicate([r, g, b], 3 * 6), n);
       }
     }
   }
