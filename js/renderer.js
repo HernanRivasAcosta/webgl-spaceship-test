@@ -15,9 +15,10 @@ class Renderer
   //============================================================================
   // Constructor
   //============================================================================
-  constructor(win, doc, drawDistance)
+  constructor(win, doc, assets, drawDistance)
   {
     this._drawDistance = drawDistance;
+    this._assets = assets;
 
     // Get the main properties
     this._w = win.innerWidth;
@@ -26,6 +27,12 @@ class Renderer
     this._h2 = enclosingPowerOf2(this._h);
 
     this._ar = this._w / this._h; // Aspect ratio
+
+    this._shaderVars = {'DRAW_DISTANCE': this._drawDistance + '.0',
+                        'RATIO_X': this._w / this._w2,
+                        'RATIO_Y': this._h / this._h2,
+                        'WIDTH': this._w2,
+                        'HEIGHT': this._h2};
 
     let canvas = doc.querySelector('#viewport');
     canvas.width = this._w;
@@ -53,13 +60,58 @@ class Renderer
     this._camera = null;
   }
 
+  update(delta)
+  {
+    this._render(this._gl, delta);
+    this._postProcess(this._gl, delta);
+  }
+
+  addObject(drawable)
+  {
+    this._objects[this._objects.length] = drawable;
+
+    let model = drawable.model;
+    if (!this._models[drawable.model])
+    {
+      this._models[drawable.model.name] = model.bindBuffers(this._gl);
+    }
+    else
+    {
+      model.clean();
+    }
+  }
+
+  removeObject(drawable)
+  {
+    let l = this._objects.length;
+    for (let i = 0; i < l; i++)
+    {
+      // Find the object to remove
+      if (this._objects[i] == drawable)
+      {
+        // We found the object, the length of the array goes down by one
+        l--;
+        // Remove the last element of the list
+        let temp = this._objects.pop();
+        // And put it in the place of the removed object (unless the last object
+        // in the list is the one we were trying to remove)
+        if (temp != drawable)
+          this._objects[i] = temp;
+        // Unbind the buffers
+        drawable.unbindBuffers(this._gl);
+        return;
+      }
+    }
+  }
+
+  //============================================================================
+  // Internal functions
+  //============================================================================
   _createMainProgram(gl)
   {
     // Load the shaders
-    let vsSource = mainVertexShaderSource(this._drawDistance);
-    let vs = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-    let fsSource = mainFragmentShaderSource();
-    let fs = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    let vs = loadVertexShader(gl, this._getShaderSource('main.vert'), this._shaderVars);
+    let fs = loadFragmentShader(gl, this._getShaderSource('main.frag'), this._shaderVars);
 
     // Create the program
     let program = gl.createProgram();
@@ -84,11 +136,8 @@ class Renderer
   _createPostProcessProgram(gl)
   {
     // Load the shaders
-    let vsSource = glowVertexShaderSource();
-    let vs = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-    let fsSource = glowFragmentShaderSource(this._w, this._w2,
-                                            this._h, this._h2);
-    let fs = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    let vs = loadVertexShader(gl, this._getShaderSource('post_process.vert'), this._shaderVars);
+    let fs = loadFragmentShader(gl, this._getShaderSource('post_process.frag'), this._shaderVars);
 
     // Create the program
     let program = gl.createProgram();
@@ -108,6 +157,19 @@ class Renderer
     return {program: program,
             attribs: this._buildAttribLocations(gl, program, attribs),
             uniforms: this._buildUniformLocations(gl, program, uniforms)};
+  }
+
+  _getShaderSource(name)
+  {
+    let source = this._assets.getAssetByName(name);
+    let keys = Object.keys(this._shaderVars);
+    let l = keys.length;
+    for (let i = 0; i < l; i++)
+    {
+      let k = keys[i];
+      source = source.replace(k, this._shaderVars[k]);
+    }
+    return source;
   }
 
   _buildAttribLocations(gl, program, list)
@@ -176,23 +238,6 @@ class Renderer
     let indexData = new Uint16Array([3, 2, 1, 3, 1, 0]);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-  }
-
-  _loadShader(gl, type, source)
-  {
-    let shader = gl.createShader(type);
-
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-
-    console.log('Shader compile log: ' + (gl.getShaderInfoLog(shader) || 'ok'));
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
-    {
-      gl.deleteShader(shader);
-      return null;
-    }
-
-    return shader;
   }
 
   _render(gl, delta)
@@ -282,52 +327,5 @@ class Renderer
 
     // Draw to the sreen buffer
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
-  }
-
-  //============================================================================
-  // Public functions
-  //============================================================================
-  update(delta)
-  {
-    this._render(this._gl, delta);
-    this._postProcess(this._gl, delta);
-  }
-
-  addObject(drawable)
-  {
-    this._objects[this._objects.length] = drawable;
-
-    let model = drawable.model;
-    if (!this._models[drawable.model])
-    {
-      this._models[drawable.model.name] = model.bindBuffers(this._gl);
-    }
-    else
-    {
-      model.clean();
-    }
-  }
-
-  removeObject(drawable)
-  {
-    let l = this._objects.length;
-    for (let i = 0; i < l; i++)
-    {
-      // Find the object to remove
-      if (this._objects[i] == drawable)
-      {
-        // We found the object, the length of the array goes down by one
-        l--;
-        // Remove the last element of the list
-        let temp = this._objects.pop();
-        // And put it in the place of the removed object (unless the last object
-        // in the list is the one we were trying to remove)
-        if (temp != drawable)
-          this._objects[i] = temp;
-        // Unbind the buffers
-        drawable.unbindBuffers(this._gl);
-        return;
-      }
-    }
   }
 }

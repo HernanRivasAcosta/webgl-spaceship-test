@@ -71,11 +71,25 @@ class Model
   //============================================================================
   // Internal functions
   //============================================================================
-  _initVertices(size)
+  _initVertices(size, autoBuildBCoordinates = false)
   {
     this._size = size;
     this._colours = new Float32Array(this._size * 3);
     this._vertices = new Float32Array(this._size * 3);
     this._bCoordinates = new Float32Array(this._size * 3);
+
+    if (autoBuildBCoordinates)
+    {
+      let l = this._size * 3 - 18;
+      for (let i = 0; i < l; i += 18)
+      {
+        this._bCoordinates.set([1.0, 0.0, 0.0,
+                                1.0, 1.0, 0.0,
+                                0.0, 0.0, 1.0,
+                                1.0, 0.0, 0.0,
+                                0.0, 1.0, 1.0,
+                                0.0, 0.0, 1.0], i);
+      }
+    }
   }
 }

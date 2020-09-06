@@ -2,7 +2,7 @@ class TerrainModel
 {
 
   get tileSize() { return this._w; }
-  get chunkSize() { return this._w * this._s; }
+  get chunkSize() { return this._chunkSize; }
 
   getCurrentChunk()
   {
@@ -22,6 +22,7 @@ class TerrainModel
     this._renderer = renderer;
 
     this._chunks = {};
+    this._chunkCache = {};
 
     // Initialise the previous position of the character
     this._px = 0;
@@ -31,8 +32,8 @@ class TerrainModel
   update(delta)
   {
     // The chunk under the player
-    let cx = Math.floor(this._player.x / this.chunkSize);
-    let cy = Math.floor(this._player.y / this.chunkSize);
+    let cx = Math.floor(this._player.x / this._chunkSize);
+    let cy = Math.floor(this._player.y / this._chunkSize);
 
     // Get the radius of chunks we need to write
     let r = Math.ceil(this._renderer.drawDistance / this._chunkSize);
@@ -109,7 +110,7 @@ class Chunk extends Model
     this._noiseLevels = [[1/30, 1],
                          [1/20, 0.5],
                          [1/10, 0.4],
-                         [1,    0.12]];
+                         [1,    0.07]];
     // Calculate the max height we can reach with our noise functions
     let maxHeight = 0;
     let l = this._noiseLevels.length;
@@ -127,14 +128,7 @@ class Chunk extends Model
 
   _generate()
   {
-    this._initVertices(2 * 4 * this._s * this._s);
-
-    let bCoordinates = duplicate([1.0, 0.0, 0.0,
-                                  1.0, 1.0, 0.0,
-                                  0.0, 0.0, 1.0,
-                                  1.0, 0.0, 0.0,
-                                  0.0, 1.0, 1.0,
-                                  0.0, 0.0, 1.0], 3);
+    this._initVertices(2 * 4 * this._s * this._s, true);
 
     let n;
     let s = this._s;
@@ -159,7 +153,7 @@ class Chunk extends Model
                            n + 15);
 
         // Barycentric data
-        this._bCoordinates.set(bCoordinates, n);
+        //this._bCoordinates.set(bCoordinates, n);
 
         // Colour data
         let r = 0.8;

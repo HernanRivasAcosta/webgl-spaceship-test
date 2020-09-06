@@ -1,45 +1,36 @@
 //==============================================================================
+// Initialisation
+//==============================================================================
+const DRAW_DISTANCE = 10000;
+const TILE_SIZE = 150;
+const MAX_HEIGHT = 1500;
+// Debug UI
+const position = document.getElementById('positionField');
+const chunk = document.getElementById('chunkField');
+
+// Variables
+let _camera, _renderer, _objects, _player, _terrain;
+
+//==============================================================================
 // Setup
 //==============================================================================
-let _drawDistance = 10000;
-let _camera = new Camera(_drawDistance);
-let _renderer = new Renderer(window, document, _drawDistance);
-_renderer.camera = _camera;
+function setup(assets)
+{
+  _camera = new Camera(DRAW_DISTANCE);
+  _renderer = new Renderer(window, document, assets, DRAW_DISTANCE);
+  _renderer.camera = _camera;
 
-// Debug UI
-let position = document.getElementById('positionField');
-let chunk = document.getElementById('chunkField');
+  _objects = [];
 
-//==============================================================================
-// Objects
-//==============================================================================
-let TILE_SIZE = 150;
-let MAX_HEIGHT = 1500;
+  _player = new Player(_camera);
+  _player.z = MAX_HEIGHT;
+  _objects[0] = _player;
 
-let objects = [];
+  _terrain = new TerrainModel(TILE_SIZE, MAX_HEIGHT, 32, 999, _player, _renderer);
+  _objects[1] = _terrain;
 
-let _player = new Player(_camera);
-objects[0] = _player;
-
-let _terrain = new TerrainModel(TILE_SIZE, MAX_HEIGHT, 32, 999, _player, _renderer);
-objects[1] = _terrain;
-
-//let worldSize = _terrain.chunkSize;
-//for (let i = 0; i <= 200; i++)
-//{
-//  let enemy = new Enemy(worldSize);
-//  enemy.setPosition((Math.random() - 0.5) * worldSize,
-//                    (Math.random() - 0.5) * worldSize,
-//                    MAX_HEIGHT * (0.4 + Math.random() * 0.4));
-//  objects[2 + i] = enemy;
-//  _renderer.addObject(enemy);
-//}
-
-_player.z = MAX_HEIGHT;
-
-//==============================================================================
-// Update
-//==============================================================================
+  requestAnimationFrame(render);
+}
 
 let then = 0;
 function render(now)
@@ -50,10 +41,10 @@ function render(now)
   then = now;
 
   // Update all objects
-  let l = objects.length;
+  let l = _objects.length;
   for (let i = 0; i < l; i++)
   {
-    objects[i].update(delta);
+    _objects[i].update(delta);
   }
 
   _renderer.update(delta);
@@ -62,4 +53,12 @@ function render(now)
   position.innerHTML = 'position: ' + _player.getPosition();
   chunk.innerHTML = 'chunk: ' + _terrain.getCurrentChunk();
 }
-requestAnimationFrame(render);
+
+//==============================================================================
+// Initialisation
+//==============================================================================
+const assets = new AssetManager(['prop_column.obj',
+                                 'main.vert',
+                                 'main.frag',
+                                 'post_process.vert',
+                                 'post_process.frag'], setup);
